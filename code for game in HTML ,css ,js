@@ -1,0 +1,160 @@
+//1️⃣ HTML (index.html)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1>🔥 Hangman Game 🔥</h1>
+        <p>Guess the word before you run out of attempts!</p>
+        <div class="word" id="word"></div>
+        <div class="letters" id="letters"></div>
+        <p class="lives">Attempts Left: <span id="lives">6</span></p>
+        <button id="reset">Restart Game</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+
+//2️⃣ CSS (styles.css)
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #282c36;
+    color: white;
+    margin: 0;
+    padding: 20px;
+}
+
+.game-container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #333;
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.2);
+}
+
+.word {
+    font-size: 2em;
+    letter-spacing: 8px;
+    margin-bottom: 20px;
+}
+
+.letters {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.letter {
+    background: #555;
+    color: white;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.letter:hover {
+    background: #777;
+}
+
+.lives {
+    font-size: 20px;
+    margin-top: 15px;
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 16px;
+    background: #ff4747;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #ff2525;
+}
+
+//3️⃣ JavaScript (script.js)
+const words = ["ignite", "coding", "future", "learning", "workshop", "innovation"];
+let selectedWord = words[Math.floor(Math.random() * words.length)];
+let guessedLetters = [];
+let lives = 6;
+
+const wordContainer = document.getElementById("word");
+const lettersContainer = document.getElementById("letters");
+const livesDisplay = document.getElementById("lives");
+const resetButton = document.getElementById("reset");
+
+// Display word with blanks
+function displayWord() {
+    wordContainer.innerHTML = selectedWord
+        .split("")
+        .map(letter => (guessedLetters.includes(letter) ? letter : "_"))
+        .join(" ");
+}
+
+// Create letter buttons
+function createLetterButtons() {
+    lettersContainer.innerHTML = "";
+    for (let i = 65; i <= 90; i++) {
+        let letter = String.fromCharCode(i).toLowerCase();
+        let button = document.createElement("button");
+        button.innerText = letter;
+        button.classList.add("letter");
+        button.addEventListener("click", () => handleGuess(letter, button));
+        lettersContainer.appendChild(button);
+    }
+}
+
+// Handle letter guess
+function handleGuess(letter, button) {
+    button.disabled = true;
+    if (selectedWord.includes(letter)) {
+        guessedLetters.push(letter);
+    } else {
+        lives--;
+        livesDisplay.innerText = lives;
+    }
+
+    displayWord();
+    checkGameOver();
+}
+
+// Check if the game is over
+function checkGameOver() {
+    if (!wordContainer.innerText.includes("_")) {
+        alert("🎉 You Won! The word was: " + selectedWord);
+        resetGame();
+    } else if (lives === 0) {
+        alert("💀 Game Over! The word was: " + selectedWord);
+        resetGame();
+    }
+}
+
+// Reset the game
+function resetGame() {
+    guessedLetters = [];
+    lives = 6;
+    selectedWord = words[Math.floor(Math.random() * words.length)];
+    livesDisplay.innerText = lives;
+    displayWord();
+    createLetterButtons();
+}
+
+// Initialize game
+displayWord();
+createLetterButtons();
+
+// Reset button event
+resetButton.addEventListener("click", resetGame);
